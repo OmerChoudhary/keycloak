@@ -70,6 +70,7 @@ public interface ClientScopeModel extends ProtocolMapperContainerModel, ScopeCon
     String INCLUDE_IN_TOKEN_SCOPE = "include.in.token.scope";
     String IS_DYNAMIC_SCOPE = "is.dynamic.scope";
     String DYNAMIC_SCOPE_REGEXP = "dynamic.scope.regexp";
+    String HIDE_FROM_OPENID_PROVIDER_METADATA = "hide.from.openID.provider.metadata";
 
     default boolean isDisplayOnConsentScreen() {
         String displayVal = getAttribute(DISPLAY_ON_CONSENT_SCREEN);
@@ -121,5 +122,14 @@ public interface ClientScopeModel extends ProtocolMapperContainerModel, ScopeCon
 
     default String getDynamicScopeRegexp() {
         return getAttribute(DYNAMIC_SCOPE_REGEXP);
+    }
+
+    default boolean isHideFromOpenIDProviderMetadata() {
+        String hideFromOpenIDProviderMetadata = getAttribute(HIDE_FROM_OPENID_PROVIDER_METADATA);
+        return hideFromOpenIDProviderMetadata==null ? false : Boolean.parseBoolean(hideFromOpenIDProviderMetadata);
+    }
+
+    default void setHideFromOpenIDProviderMetadata(boolean hideFromOpenIDProviderMetadata) {
+        setAttribute(HIDE_FROM_OPENID_PROVIDER_METADATA, String.valueOf(hideFromOpenIDProviderMetadata));
     }
 }

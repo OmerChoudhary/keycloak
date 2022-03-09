@@ -77,6 +77,13 @@
                 </div>
                 <kc-tooltip>{{:: 'client-scope.include-in-token-scope.tooltip' | translate}}</kc-tooltip>
             </div>
+            <div class="form-group clearfix block" data-ng-show="protocol == 'openid-connect'">
+                <label class="col-md-2 control-label" for="hideFromOpenIDProviderMetadata">{{:: 'client-scope.hide-from-openID-provider-metadata' | translate}}</label>
+                <div class="col-sm-6">
+                    <input ng-model="hideFromOpenIDProviderMetadata" ng-click="switchChange()" name="hideFromOpenIDProviderMetadata" id="hideFromOpenIDProviderMetadata" onoffswitch on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}"/>
+                </div>
+                <kc-tooltip>{{:: 'client-scope.hide-from-openID-provider-metadata.tooltip' | translate}}</kc-tooltip>
+            </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="guiOrder">{{:: 'client-scope.gui-order' | translate}} </label>
                 <div class="col-sm-6">
