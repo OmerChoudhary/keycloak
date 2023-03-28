@@ -209,6 +209,8 @@ public class ProvidersTest extends AbstractAuthenticationTest {
                 "Executes the current flow only if authenticators are configured");
         addProviderInfo(result, "conditional-user-attribute", "Condition - user attribute",
                 "Flow is executed only if the user attribute exists and has the expected value");
+        addProviderInfo(result, "conditional-client-ip-address", "Condition - IP range",
+                "Flow is executed only if the client ip address is in specified ip ranges / subnets");
         addProviderInfo(result, "set-attribute", "Set user attribute",
                 "Set a user attribute");
         addProviderInfo(result, "idp-detect-existing-broker-user", "Detect existing broker user",
