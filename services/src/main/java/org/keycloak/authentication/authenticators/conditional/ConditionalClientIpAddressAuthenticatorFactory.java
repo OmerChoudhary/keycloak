@@ -15,8 +15,8 @@ public class ConditionalClientIpAddressAuthenticatorFactory implements Condition
 
     public static final String PROVIDER_ID = "conditional-client-ip-address";
 
-    static final String CONF_IP_RANGES = "ip-ranges";
-    static final String CONF_EXCLUDE = "exclude";
+    public static final String CONF_IP_RANGES = "ip-ranges";
+    public static final String CONF_EXCLUDE = "exclude";
 
     private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = new AuthenticationExecutionModel.Requirement[]{
             AuthenticationExecutionModel.Requirement.REQUIRED,
