@@ -7,6 +7,7 @@ import org.keycloak.authentication.authenticators.access.AllowAccessAuthenticato
 import org.keycloak.authentication.authenticators.access.DenyAccessAuthenticatorFactory;
 import org.keycloak.authentication.authenticators.browser.PasswordFormFactory;
 import org.keycloak.authentication.authenticators.browser.UsernameFormFactory;
+import org.keycloak.authentication.authenticators.conditional.ConditionalClientIpAddressAuthenticatorFactory;
 import org.keycloak.authentication.authenticators.conditional.ConditionalRoleAuthenticatorFactory;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.keycloak.models.Constants.CFG_DELIMITER;
 import static org.keycloak.testsuite.forms.BrowserFlowTest.revertFlows;
 
 /**
@@ -291,6 +293,100 @@ public class AllowDenyAuthenticatorTest extends AbstractTestRealmKeycloakTest {
         } finally {
             revertFlows(testRealm(), newFlowAlias);
         }
+    }
+
+    /**
+     * Test ip range condition with matching ip
+     */
+    @Test
+    public void testMatchingIpRange() {
+        final boolean expectLoginPossible = false;
+        final boolean excludeRanges = false;
+        testConditionalClientIpAddressAuthenticator(expectLoginPossible, excludeRanges, "127.0.0.1/16", "::1");
+    }
+
+    /**
+     * Test ip range condition with non-matching ip
+     */
+    @Test
+    public void testNotMatchingIpRange() {
+        final boolean expectLoginPossible = true;
+        final boolean excludeRanges = false;
+        testConditionalClientIpAddressAuthenticator(expectLoginPossible, excludeRanges, "104.52.36.1/24", "1:2:3::a:b:c");
+    }
+
+    /**
+     * Test ip range condition with matching ip and excluded = true
+     */
+    @Test
+    public void testMatchingIpRangeExcluded() {
+        final boolean expectLoginPossible = true;
+        final boolean excludeRanges = true;
+        testConditionalClientIpAddressAuthenticator(expectLoginPossible, excludeRanges, "127.0.0.1/16", "::1");
+    }
+
+    /**
+     * Test ip range condition with non-matching ip and excluded = true
+     */
+    @Test
+    public void testNotMatchingIpRangeExcluded() {
+        final boolean expectLoginPossible = false;
+        final boolean excludeRanges = true;
+        testConditionalClientIpAddressAuthenticator(expectLoginPossible, excludeRanges, "104.52.36.1/24", "1:2:3::a:b:c");
+    }
+
+    private void testConditionalClientIpAddressAuthenticator(boolean expectLoginPossible, boolean excludeRanges, String... configuredIpRanges) {
+        final String flowAlias = "browser - ip range condition";
+        final String errorMessage = "this is the expected error message";
+        final String user = "john-doh@localhost";
+
+        Map<String, String> attributeConfigMap = new HashMap<>();
+        attributeConfigMap.put(ConditionalClientIpAddressAuthenticatorFactory.CONF_IP_RANGES, String.join(CFG_DELIMITER, configuredIpRanges));
+        attributeConfigMap.put(ConditionalClientIpAddressAuthenticatorFactory.CONF_EXCLUDE, Boolean.toString(excludeRanges));
+
+        Map<String, String> denyAccessConfigMap = new HashMap<>();
+        denyAccessConfigMap.put(DenyAccessAuthenticatorFactory.ERROR_MESSAGE, errorMessage);
+
+        configureBrowserFlowWithDenyAccessInConditionalFlow(flowAlias, ConditionalClientIpAddressAuthenticatorFactory.PROVIDER_ID, attributeConfigMap, denyAccessConfigMap);
+
+        try{
+            if (expectLoginPossible) {
+
+                final String userId = testRealm().users().search(user).get(0).getId();
+
+                loginUsernameOnlyPage.open();
+                loginUsernameOnlyPage.assertCurrent();
+                loginUsernameOnlyPage.login(user);
+
+                passwordPage.assertCurrent();
+                passwordPage.login("password");
+
+                events.expectLogin()
+                        .user(userId)
+                        .detail(Details.USERNAME, user)
+                        .removeDetail(Details.CONSENT)
+                        .assertEvent();
+            } else {
+
+                loginUsernameOnlyPage.open();
+                loginUsernameOnlyPage.assertCurrent();
+                loginUsernameOnlyPage.login(user);
+
+                errorPage.assertCurrent();
+                assertThat(errorPage.getError(), is(errorMessage));
+
+                events.expectLogin()
+                        .user((String) null)
+                        .session((String) null)
+                        .error(Errors.ACCESS_DENIED)
+                        .detail(Details.USERNAME, user)
+                        .removeDetail(Details.CONSENT)
+                        .assertEvent();
+            }
+        } finally {
+            revertFlows(testRealm(), flowAlias);
+        }
+
     }
 
     /**
