@@ -128,9 +128,6 @@ public final class LDAPContextManager implements AutoCloseable {
             throw ne;
         }
 
-        // throws AuthenticationException when authentication fails
-        ldapContext.lookup("");
-
         return tls;
     }
 

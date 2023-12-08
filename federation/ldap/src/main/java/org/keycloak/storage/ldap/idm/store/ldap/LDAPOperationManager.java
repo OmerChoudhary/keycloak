@@ -22,10 +22,13 @@ import org.keycloak.common.util.Time;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.LDAPConstants;
 import org.keycloak.models.ModelException;
+import org.keycloak.storage.ldap.ChangePasswordAfterResetException;
 import org.keycloak.storage.ldap.LDAPConfig;
 import org.keycloak.storage.ldap.idm.model.LDAPDn;
 import org.keycloak.storage.ldap.idm.query.EscapeStrategy;
 import org.keycloak.storage.ldap.idm.query.internal.LDAPQuery;
+import org.keycloak.storage.ldap.idm.store.ldap.control.PasswordPolicyResponseControl;
+import org.keycloak.storage.ldap.idm.store.ldap.control.PasswordPolicyResponseControlFactory;
 import org.keycloak.storage.ldap.idm.store.ldap.extended.PasswordModifyRequest;
 import org.keycloak.storage.ldap.mappers.LDAPOperationDecorator;
 import org.keycloak.truststore.TruststoreProvider;
@@ -42,6 +45,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.BasicControl;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
@@ -502,14 +506,18 @@ public class LDAPOperationManager {
             // Never use connection pool to prevent password caching
             env.put("com.sun.jndi.ldap.connect.pool", "false");
 
-            if(!this.config.isStartTls()) {
+            // Send a passwordPolicyRequest control as non-critical.
+            env.put(LdapContext.CONTROL_FACTORIES, PasswordPolicyResponseControlFactory.class.getName());
+            Control[] connCtls = { new BasicControl(PasswordPolicyResponseControl.OID, false, null) };
+
+            if (!this.config.isStartTls()) {
                 env.put(Context.SECURITY_AUTHENTICATION, "simple");
                 env.put(Context.SECURITY_PRINCIPAL, dn.toString());
                 env.put(Context.SECURITY_CREDENTIALS, password);
-            }
+                authCtx = new InitialLdapContext(env, connCtls);
+            } else {
+                authCtx = new InitialLdapContext(env, null);
 
-            authCtx = new InitialLdapContext(env, null);
-            if (config.isStartTls()) {
                 SSLSocketFactory sslSocketFactory = null;
                 if (LDAPUtil.shouldUseTruststoreSpi(config)) {
                     TruststoreProvider provider = session.getProvider(TruststoreProvider.class);
@@ -522,7 +530,25 @@ public class LDAPOperationManager {
                 if (tlsResponse == null) {
                     throw new AuthenticationException("Null TLS Response returned from the authentication");
                 }
+
+                // Explicitly initiate bind with given request controls.
+                // Throws AuthenticationException when authentication fails.
+                authCtx.reconnect(connCtls);
             }
+
+            // Check for password policy response control in the response. If present and forced password change is required, throw an exception.
+            Control[] responseControls = authCtx.getResponseControls();
+            if (responseControls != null) {
+                for (Control control : responseControls) {
+                    if (control instanceof PasswordPolicyResponseControl) {
+                        PasswordPolicyResponseControl response = (PasswordPolicyResponseControl) control;
+                        if (response.changeAfterReset()) {
+                            throw new ChangePasswordAfterResetException();
+                        }
+                    }
+                }
+            }
+
         } catch (AuthenticationException ae) {
             if (logger.isDebugEnabled()) {
                 logger.debugf(ae, "Authentication failed for DN [%s]", dn);
@@ -533,7 +559,7 @@ public class LDAPOperationManager {
             if (logger.isDebugEnabled()) {
                 logger.debugf(re, "LDAP Connection TimeOut for DN [%s]", dn);
             }
-            
+
             throw re;
 
         } catch (Exception e) {
