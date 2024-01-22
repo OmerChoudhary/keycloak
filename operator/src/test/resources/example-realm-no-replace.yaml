@@ -4,19 +4,6 @@ metadata:
   name: example-count0-kc
 spec:
   keycloakCRName: example-kc
-  placeholders:
-    - name: KC_SMTP_PORT
-      secret:
-        name: keycloak-smtp-secret
-        key: KC_SMTP_PORT
-    - name: KC_SMTP_SERVER
-      secret:
-        name: keycloak-smtp-secret
-        key: KC_SMTP_SERVER
-    - name: KC_SMTP_FROM
-      secret:
-        name: keycloak-smtp-secret
-        key: KC_SMTP_FROM
   realm:
     id: count0
     realm: count0

@@ -17,10 +17,7 @@
 
 package org.keycloak.operator.testsuite.integration;
 
-import io.fabric8.kubernetes.api.model.Container;
-import io.fabric8.kubernetes.api.model.LocalObjectReferenceBuilder;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.ResourceRequirements;
+import io.fabric8.kubernetes.api.model.*;
 import io.quarkus.logging.Log;
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -49,8 +46,7 @@ import static org.keycloak.operator.controllers.KeycloakDistConfigurator.getKeyc
 import static org.keycloak.operator.crds.v2alpha1.realmimport.KeycloakRealmImportStatusCondition.DONE;
 import static org.keycloak.operator.crds.v2alpha1.realmimport.KeycloakRealmImportStatusCondition.HAS_ERRORS;
 import static org.keycloak.operator.crds.v2alpha1.realmimport.KeycloakRealmImportStatusCondition.STARTED;
-import static org.keycloak.operator.testsuite.utils.K8sUtils.deployKeycloak;
-import static org.keycloak.operator.testsuite.utils.K8sUtils.inClusterCurl;
+import static org.keycloak.operator.testsuite.utils.K8sUtils.*;
 
 @QuarkusTest
 public class RealmImportTest extends BaseOperatorTest {
@@ -87,10 +83,17 @@ public class RealmImportTest extends BaseOperatorTest {
                 .collect(Collectors.joining());
     }
 
+    protected static void deploySmtpSecret() {
+        K8sUtils.set(k8sclient, getResourceFromFile("example-smtp-secret.yaml", Secret.class));
+    }
+
     @Test
     public void testWorkingRealmImport() {
         // Arrange
         var kc = getTestKeycloakDeployment(false);
+
+        deploySmtpSecret();
+
         kc.getSpec().setImage(null); // checks the job args for the base, not custom image
         kc.getSpec().setImagePullSecrets(Arrays.asList(new LocalObjectReferenceBuilder().withName("my-empty-secret").build()));
         deployKeycloak(k8sclient, kc, false);
@@ -99,6 +102,25 @@ public class RealmImportTest extends BaseOperatorTest {
         K8sUtils.set(k8sclient, getClass().getResourceAsStream("/example-realm.yaml"));
 
         // Assert
+        assertWorkingRealmImport(kc, true);
+    }
+
+    @Test
+    public void testWorkingRealmImportNoReplacement() {
+        // Arrange
+        var kc = getTestKeycloakDeployment(false);
+        kc.getSpec().setImage(null); // checks the job args for the base, not custom image
+        kc.getSpec().setImagePullSecrets(Arrays.asList(new LocalObjectReferenceBuilder().withName("my-empty-secret").build()));
+        deployKeycloak(k8sclient, kc, false);
+
+        // Act
+        K8sUtils.set(k8sclient, getClass().getResourceAsStream("/example-realm-no-replace.yaml"));
+
+        // Assert
+        assertWorkingRealmImport(kc, false);
+    }
+
+    private void assertWorkingRealmImport(Keycloak kc, boolean checkPlaceholders) {
         var crSelector = k8sclient
                 .resources(KeycloakRealmImport.class)
                 .inNamespace(namespace)
@@ -131,6 +153,16 @@ public class RealmImportTest extends BaseOperatorTest {
         var envvars = container.getEnv();
         assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("cache"))).findAny().get().getValue()).isEqualTo("local");
         assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("health-enabled"))).findAny().get().getValue()).isEqualTo("false");
+
+        if (checkPlaceholders) {
+            assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("SMTP_PORT"))).findAny().get().getName()).isEqualTo("KC_SMTP_PORT");
+            assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("SMTP_SERVER"))).findAny().get().getName()).isEqualTo("KC_SMTP_SERVER");
+            assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("SMTP_FROM"))).findAny().get().getName()).isEqualTo("KC_SMTP_FROM");
+        } else {
+            assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("SMTP_PORT"))).findAny().isEmpty()).isEqualTo(true);
+            assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("SMTP_SERVER"))).findAny().isEmpty()).isEqualTo(true);
+            assertThat(envvars.stream().filter(e -> e.getName().equals(getKeycloakOptionEnvVarName("SMTP_FROM"))).findAny().isEmpty()).isEqualTo(true);
+        }
         assertThat(job.getSpec().getTemplate().getSpec().getImagePullSecrets().size()).isEqualTo(1);
         assertThat(job.getSpec().getTemplate().getSpec().getImagePullSecrets().get(0).getName()).isEqualTo("my-empty-secret");
 
