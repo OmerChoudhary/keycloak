@@ -7,7 +7,7 @@ import {
 } from "@keycloak/keycloak-ui-shared";
 
 import { adminClient } from "../../admin-client";
-import environment from "../../environment";
+import { environment } from "../../environment";
 import { DEFAULT_LOCALE, i18n } from "../../i18n/i18n";
 import { useFetch } from "../../utils/useFetch";
 import { useRealm } from "../realm-context/RealmContext";
@@ -66,7 +66,7 @@ type WhoAmIProps = {
 
 export const WhoAmIContext = createNamedContext<WhoAmIProps | undefined>(
   "WhoAmIContext",
-  undefined,
+  undefined
 );
 
 export const useWhoAmI = () => useRequiredContext(WhoAmIContext);
@@ -86,7 +86,7 @@ export const WhoAmIContextProvider = ({ children }: PropsWithChildren) => {
       const whoAmI = new WhoAmI(me);
       setWhoAmI(whoAmI);
     },
-    [key, realm],
+    [key, realm]
   );
 
   return (

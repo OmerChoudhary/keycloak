@@ -348,6 +348,11 @@ public class AdminConsole {
             map.put("clientId", Constants.ADMIN_CONSOLE_CLIENT_ID);
             map.put("properties", theme.getProperties());
 
+            String devServerUrl = System.getenv("KEYCLOAK_ADMIN_VITE_URL");
+            if (devServerUrl != null) {
+                map.put("devServerUrl", devServerUrl);
+            }
+
             FreeMarkerProvider freeMarkerUtil = session.getProvider(FreeMarkerProvider.class);
             String result = freeMarkerUtil.processTemplate(map, "index.ftl", theme);
             Response.ResponseBuilder builder = Response.status(Response.Status.OK).type(MediaType.TEXT_HTML_UTF_8).language(Locale.ENGLISH).entity(result);

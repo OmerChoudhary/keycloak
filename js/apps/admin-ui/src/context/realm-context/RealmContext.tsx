@@ -7,7 +7,7 @@ import {
 
 import { adminClient } from "../../admin-client";
 import { DashboardRouteWithRealm } from "../../dashboard/routes/Dashboard";
-import environment from "../../environment";
+import { environment } from "../../environment";
 
 type RealmContextType = {
   realm: string;
@@ -15,7 +15,7 @@ type RealmContextType = {
 
 export const RealmContext = createNamedContext<RealmContextType | undefined>(
   "RealmContext",
-  undefined,
+  undefined
 );
 
 export const RealmContextProvider = ({ children }: PropsWithChildren) => {
@@ -27,7 +27,7 @@ export const RealmContextProvider = ({ children }: PropsWithChildren) => {
   const realmParam = routeMatch?.params.realm;
   const realm = useMemo(
     () => decodeURIComponent(realmParam ?? environment.loginRealm),
-    [realmParam],
+    [realmParam]
   );
 
   // Configure admin client to use selected realm when it changes.

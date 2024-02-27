@@ -36,7 +36,7 @@ import FeatureRepresentation, {
 import { useRealm } from "../context/realm-context/RealmContext";
 import { useServerInfo } from "../context/server-info/ServerInfoProvider";
 import { HelpItem, label } from "@keycloak/keycloak-ui-shared";
-import environment from "../environment";
+import { environment } from "../environment";
 import { KeycloakSpinner } from "../components/keycloak-spinner/KeycloakSpinner";
 import useLocaleSort, { mapByKey } from "../utils/useLocaleSort";
 import {
@@ -107,17 +107,17 @@ const Dashboard = () => {
 
   const sortedFeatures = useMemo(
     () => localeSort(serverInfo.features ?? [], mapByKey("name")),
-    [serverInfo.features],
+    [serverInfo.features]
   );
 
   const disabledFeatures = useMemo(
     () => sortedFeatures.filter((f) => !f.enabled) || [],
-    [serverInfo.features],
+    [serverInfo.features]
   );
 
   const enabledFeatures = useMemo(
     () => sortedFeatures.filter((f) => f.enabled) || [],
-    [serverInfo.features],
+    [serverInfo.features]
   );
 
   const useTab = (tab: DashboardTab) =>
@@ -125,7 +125,7 @@ const Dashboard = () => {
       toDashboard({
         realm,
         tab,
-      }),
+      })
     );
 
   useFetch(() => adminClient.realms.findOne({ realm }), setRealmInfo, []);

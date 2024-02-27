@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { getRootPath } from "../src/utils/getRootPath";
 import { login } from "./login";
-import { getAccountUrl, getAdminUrl } from "./utils";
+import { getAccountUrl, getAdminUrl, getRootPath } from "./utils";
 
 test.describe("Applications test", () => {
   test.beforeEach(async ({ page }) => {
@@ -27,7 +26,7 @@ test.describe("Applications test", () => {
 
     await expect(page.getByTestId("applications-list-item")).toHaveCount(1);
     await expect(page.getByTestId("applications-list-item")).toContainText(
-      process.env.CI ? "Account Console" : "security-admin-console-v2",
+      "Account Console",
     );
   });
 
@@ -49,9 +48,7 @@ test.describe("Applications test", () => {
       await expect(page1.getByTestId("applications-list-item")).toHaveCount(1);
       await expect(
         page1.getByTestId("applications-list-item").nth(0),
-      ).toContainText(
-        process.env.CI ? "Account Console" : "security-admin-console-v2",
-      );
+      ).toContainText("Account Console");
     } finally {
       await context1.close();
       await context2.close();
@@ -59,11 +56,6 @@ test.describe("Applications test", () => {
   });
 
   test("Two applications", async ({ page }) => {
-    test.skip(
-      !process.env.CI,
-      "Skip this test if not running with regular Keycloak",
-    );
-
     await login(page, "admin", "admin");
 
     // go to admin console

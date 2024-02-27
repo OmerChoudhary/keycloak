@@ -135,6 +135,11 @@ public class AccountConsole implements AccountResourceProvider {
             }
         });
 
+        String devServerUrl = System.getenv("KEYCLOAK_ACCOUNT_VITE_URL");
+        if (devServerUrl != null) {
+            map.put("devServerUrl", devServerUrl);
+        }
+
         map.put("isAuthorizationEnabled", Profile.isFeatureEnabled(Profile.Feature.AUTHORIZATION));
 
         boolean deleteAccountAllowed = false;

@@ -22,6 +22,7 @@ export {
   type KeycloakTextAreaProps,
 } from "./controls/keycloak-text-area/KeycloakTextArea";
 export { IconMapper } from "./icons/IconMapper";
+export { default as KeycloakMasthead } from "./masthead/Masthead";
 export { FormPanel } from "./scroll-form/FormPanel";
 export { ScrollForm, mainPageContentId } from "./scroll-form/ScrollForm";
 export { UserProfileFields } from "./user-profile/UserProfileFields";
@@ -34,7 +35,7 @@ export {
 } from "./user-profile/utils";
 export type { UserFormFields } from "./user-profile/utils";
 export { createNamedContext } from "./utils/createNamedContext";
+export { getInjectedEnvironment } from "./utils/getInjectedEnvironment";
 export { isDefined } from "./utils/isDefined";
 export { useRequiredContext } from "./utils/useRequiredContext";
 export { useStoredState } from "./utils/useStoredState";
-export { default as KeycloakMasthead } from "./masthead/Masthead";

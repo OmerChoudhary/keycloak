@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { HelpItem, TextControl } from "@keycloak/keycloak-ui-shared";
 import { FormattedLink } from "../../components/external-link/FormattedLink";
 import { useRealm } from "../../context/realm-context/RealmContext";
-import environment from "../../environment";
+import { environment } from "../../environment";
 import { DisplayOrder } from "../component/DisplayOrder";
 import { RedirectUrl } from "../component/RedirectUrl";
 
