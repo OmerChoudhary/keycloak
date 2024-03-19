@@ -28,8 +28,8 @@ import java.util.Set;
 public class Constants {
 
     public static final EventType[] EXPOSED_LOG_EVENTS = {
-            EventType.LOGIN, EventType.LOGOUT, EventType.REGISTER, EventType.REMOVE_FEDERATED_IDENTITY, EventType.REMOVE_TOTP, EventType.SEND_RESET_PASSWORD,
-            EventType.SEND_VERIFY_EMAIL, EventType.FEDERATED_IDENTITY_LINK, EventType.UPDATE_EMAIL, EventType.UPDATE_PASSWORD, EventType.UPDATE_PROFILE, EventType.UPDATE_TOTP, EventType.VERIFY_EMAIL
+            EventType.LOGIN, EventType.LOGOUT, EventType.REGISTER, EventType.REMOVE_FEDERATED_IDENTITY, EventType.SEND_RESET_PASSWORD,
+            EventType.SEND_VERIFY_EMAIL, EventType.FEDERATED_IDENTITY_LINK, EventType.UPDATE_EMAIL, EventType.UPDATE_CREDENTIAL, EventType.REMOVE_CREDENTIAL, EventType.UPDATE_PROFILE, EventType.VERIFY_EMAIL
     };
 
     public static final Set<String> EXPOSED_LOG_DETAILS = new HashSet<>();

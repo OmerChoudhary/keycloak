@@ -145,12 +145,10 @@ public class DeleteCredentialAction implements RequiredActionProvider, RequiredA
 
     private void setupEvent(CredentialModel credential, EventBuilder event) {
         if (credential != null) {
-            if (OTPCredentialModel.TYPE.equals(credential.getType())) {
-                event.event(EventType.REMOVE_TOTP);
-            }
-            event.detail(Details.CREDENTIAL_TYPE, credential.getType())
-                    .detail(Details.CREDENTIAL_ID, credential.getId())
-                    .detail(Details.CREDENTIAL_USER_LABEL, credential.getUserLabel());
+            event.event(EventType.REMOVE_CREDENTIAL)
+                .detail(Details.CREDENTIAL_TYPE, credential.getType())
+                .detail(Details.CREDENTIAL_ID, credential.getId())
+                .detail(Details.CREDENTIAL_USER_LABEL, credential.getUserLabel());
         }
     }
 

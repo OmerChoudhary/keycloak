@@ -26,6 +26,7 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.events.Details;
 import org.keycloak.events.EventType;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.representations.idm.EventRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -87,7 +88,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
         changePasswordPage.changePassword("new-password", "new-password");
 
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
 
         assertKcActionStatus(SUCCESS);
 
@@ -125,7 +126,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
         changePasswordPage.changePassword("new-password", "new-password");
 
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
         assertKcActionStatus(SUCCESS);
     }
 
@@ -168,7 +169,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
             changePasswordPage.changePassword("new-password", "new-password");
 
-            events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+            events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
             assertKcActionStatus(SUCCESS);
         } finally {
             // reset password policy to previous state
@@ -208,7 +209,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
         changePasswordPage.changePassword("new-password", "new-password");
 
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
 
         assertKcActionStatus(SUCCESS);
     }
@@ -237,7 +238,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         assertTrue("Logout sessions is checked by default", changePasswordPage.isLogoutSessionsChecked());
         changePasswordPage.changePassword("All Right Then, Keep Your Secrets", "All Right Then, Keep Your Secrets");
         events.expectLogout(event2.getSessionId()).detail(Details.LOGOUT_TRIGGERED_BY_REQUIRED_ACTION, UserModel.RequiredAction.UPDATE_PASSWORD.name()).assertEvent();
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
         assertKcActionStatus(SUCCESS);
 
         sessions = testUser.getUserSessions();
@@ -265,7 +266,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         changePasswordPage.assertCurrent();
         changePasswordPage.uncheckLogoutSessions();
         changePasswordPage.changePassword("All Right Then, Keep Your Secrets", "All Right Then, Keep Your Secrets");
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
         assertKcActionStatus(SUCCESS);
 
         assertEquals(2, testUser.getUserSessions().size());

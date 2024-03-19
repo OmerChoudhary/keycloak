@@ -27,6 +27,7 @@ import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
 import org.keycloak.credential.OTPCredentialProvider;
+import org.keycloak.events.Details;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.models.KeycloakSession;
@@ -71,7 +72,7 @@ public class UpdateTotp implements RequiredActionProvider, RequiredActionFactory
     @Override
     public void processAction(RequiredActionContext context) {
         EventBuilder event = context.getEvent();
-        event.event(EventType.UPDATE_TOTP);
+        event.event(EventType.UPDATE_CREDENTIAL);
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String challengeResponse = formData.getFirst("totp");
         String totpSecret = formData.getFirst("totpSecret");
@@ -80,6 +81,7 @@ public class UpdateTotp implements RequiredActionProvider, RequiredActionFactory
 
         OTPPolicy policy = context.getRealm().getOTPPolicy();
         OTPCredentialModel credentialModel = OTPCredentialModel.createFromPolicy(context.getRealm(), totpSecret, userLabel);
+        event.detail(Details.CREDENTIAL_TYPE, credentialModel.getType());
         if (Validation.isBlank(challengeResponse)) {
             Response challenge = context.form()
                     .setAttribute("mode", mode)

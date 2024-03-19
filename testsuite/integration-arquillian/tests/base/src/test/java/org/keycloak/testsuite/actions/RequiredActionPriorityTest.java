@@ -31,6 +31,8 @@ import org.keycloak.events.Details;
 import org.keycloak.events.EventType;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserModel.RequiredAction;
+import org.keycloak.models.credential.OTPCredentialModel;
+import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.utils.TimeBasedOTP;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -109,7 +111,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // Second, change password
         changePasswordPage.assertCurrent();
         changePasswordPage.changePassword("new-password", "new-password");
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
 
         // Finally, update profile
         updateProfilePage.assertCurrent();
@@ -143,7 +145,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // First, change password
         changePasswordPage.assertCurrent();
         changePasswordPage.changePassword("new-password", "new-password");
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
 
         // Second, update profile
         updateProfilePage.assertCurrent();
@@ -186,7 +188,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // change password
         changePasswordPage.assertCurrent();
         changePasswordPage.changePassword("new-password", "new-password");
-        events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
 
         // CONFIGURE_TOTP
         totpPage.assertCurrent();
@@ -198,7 +200,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
 
         TimeBasedOTP totp = new TimeBasedOTP();
         totpPage.configure(totp.generateTOTP(totpPage.getTotpSecret()), "userLabel");
-        events.expectRequiredAction(EventType.UPDATE_TOTP).assertEvent();
+        events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, OTPCredentialModel.TYPE).assertEvent();
 
         // Logined
         appPage.assertCurrent();

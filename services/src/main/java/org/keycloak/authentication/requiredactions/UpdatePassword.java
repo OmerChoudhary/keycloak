@@ -34,6 +34,7 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.ModelException;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.policy.MaxAuthAgePasswordPolicyProviderFactory;
 import org.keycloak.services.messages.Messages;
@@ -109,11 +110,12 @@ public class UpdatePassword implements RequiredActionProvider, RequiredActionFac
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
         UserModel user = context.getUser();
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        event.event(EventType.UPDATE_PASSWORD);
+        event.event(EventType.UPDATE_CREDENTIAL);
+        event.detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.PASSWORD);
         String passwordNew = formData.getFirst("password-new");
         String passwordConfirm = formData.getFirst("password-confirm");
 
-        EventBuilder errorEvent = event.clone().event(EventType.UPDATE_PASSWORD_ERROR)
+        EventBuilder errorEvent = event.clone().event(EventType.UPDATE_CREDENTIAL_ERROR)
                 .client(authSession.getClient())
                 .user(authSession.getAuthenticatedUser());
 

@@ -44,6 +44,7 @@ import org.keycloak.models.BrowserSecurityHeaders;
 import org.keycloak.models.ClientScopeModel;
 import org.keycloak.models.Constants;
 import org.keycloak.models.UserModel.RequiredAction;
+import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.utils.SessionTimeoutHelper;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.OIDCLoginProtocolService;
@@ -531,7 +532,7 @@ public class LoginTest extends AbstractTestRealmKeycloakTest {
 
             setTimeOffset(0);
 
-            events.expectRequiredAction(EventType.UPDATE_PASSWORD).user(userId).detail(Details.USERNAME, "login-test").assertEvent();
+            events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).user(userId).detail(Details.USERNAME, "login-test").assertEvent();
 
             String currentUrl = driver.getCurrentUrl();
             String pageSource = driver.getPageSource();
