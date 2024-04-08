@@ -11,6 +11,15 @@ better security, with almost the same CPU time as previous releases of {project_
 memory, which is a requirement to be resistant against GPU attacks. The defaults for Argon2 in {project_name} requires 7MB
 per-hashing request.
 
+= Java 21 support
+
+{project_name} now supports OpenJDK 21, as we want to stick to the latest LTS OpenJDK versions.
+
+= Java 17 is deprecated
+
+OpenJDK 17 is deprecated, and the support will be removed in the following releases in favor of OpenJDK 21.
+It is still possible to use it, but the test coverage might be decreased.
+
 = Deprecated cookie methods removed
 
 The following methods for setting custom cookies have been removed:
