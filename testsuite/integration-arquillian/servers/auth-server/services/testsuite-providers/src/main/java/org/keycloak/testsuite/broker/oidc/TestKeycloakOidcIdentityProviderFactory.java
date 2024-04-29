@@ -22,6 +22,7 @@ import org.keycloak.broker.oidc.KeycloakOIDCIdentityProvider;
 import org.keycloak.broker.oidc.KeycloakOIDCIdentityProviderFactory;
 import org.keycloak.broker.oidc.OIDCIdentityProviderConfig;
 import org.keycloak.broker.provider.AuthenticationRequest;
+import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
@@ -32,6 +33,7 @@ public class TestKeycloakOidcIdentityProviderFactory extends KeycloakOIDCIdentit
 
     public static final String ID = "test-keycloak-oidc";
     public static final String IGNORE_MAX_AGE_PARAM = "ignore-max-age-param";
+    public static final String PREFERRED_USERNAME = "preferred-username";
 
     public static void setIgnoreMaxAgeParam(IdentityProviderRepresentation rep) {
         rep.getConfig().put(IGNORE_MAX_AGE_PARAM, Boolean.TRUE.toString());
@@ -60,8 +62,24 @@ public class TestKeycloakOidcIdentityProviderFactory extends KeycloakOIDCIdentit
                 }
             }
 
+            @Override
+            public BrokeredIdentityContext getFederatedIdentity(String response) {
+                BrokeredIdentityContext identity = super.getFederatedIdentity(response);
+                String preferredUsername = getPreferredUsername();
+
+                if (preferredUsername != null) {
+                    identity.setUsername(preferredUsername);
+                }
+
+                return identity;
+            }
+
             private boolean isIgnoreMaxAgeParam() {
                 return Boolean.parseBoolean(model.getConfig().getOrDefault(IGNORE_MAX_AGE_PARAM, Boolean.FALSE.toString()));
+            }
+
+            private String getPreferredUsername() {
+                return model.getConfig().get(PREFERRED_USERNAME);
             }
         };
     }
