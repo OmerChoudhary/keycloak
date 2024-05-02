@@ -31,7 +31,7 @@ import { ViewHeader } from "../components/view-header/ViewHeader";
 import { useRealms } from "../context/RealmsContext";
 import { useRealm } from "../context/realm-context/RealmContext";
 import { toDashboard } from "../dashboard/routes/Dashboard";
-import environment from "../environment";
+import { environment } from "../environment";
 import helpUrls from "../help-urls";
 import { convertFormValuesToObject, convertToFormValues } from "../util";
 import { getAuthorizationHeaders } from "../utils/getAuthorizationHeaders";
@@ -240,7 +240,7 @@ export const RealmSettingsTabs = ({
             } catch (error) {
               return [];
             }
-          }),
+          })
         );
       } catch (error) {
         return [];
@@ -259,8 +259,8 @@ export const RealmSettingsTabs = ({
         Object.fromEntries(
           (r.attributes["acr.loa.map"] as KeyValueType[])
             .filter(({ key }) => key !== "")
-            .map(({ key, value }) => [key, value]),
-        ),
+            .map(({ key, value }) => [key, value])
+        )
       );
     }
 
@@ -284,7 +284,7 @@ export const RealmSettingsTabs = ({
             "Content-Type": "application/json",
             ...getAuthorizationHeaders(await adminClient.getAccessToken()),
           },
-        },
+        }
       );
       if (!response.ok) throw new Error(response.statusText);
       addAlert(t("realmSaveSuccess"), AlertVariant.success);
@@ -322,7 +322,7 @@ export const RealmSettingsTabs = ({
       toClientPolicies({
         realm: realmName,
         tab,
-      }),
+      })
     );
 
   const clientPoliciesProfilesTab = useClientPoliciesTab("profiles");

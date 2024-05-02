@@ -1,5 +1,4 @@
-import { matchPath } from "react-router-dom";
-import { DEFAULT_REALM, ROOT_PATH } from "./constants";
+import { getInjectedEnvironment } from "@keycloak/keycloak-ui-shared";
 
 export type Feature = {
   isRegistrationEmailAsUsername: boolean;
@@ -40,60 +39,4 @@ export type Environment = {
   referrerUrl?: string;
 };
 
-// Detect the current realm from the URL.
-const match = matchPath(ROOT_PATH, location.pathname);
-
-const defaultEnvironment: Environment = {
-  authUrl: "http://localhost:8180",
-  baseUrl: `http://localhost:8180/realms/${match?.params.realm ?? DEFAULT_REALM}/account/`,
-  realm: match?.params.realm ?? DEFAULT_REALM,
-  clientId: "security-admin-console-v2",
-  resourceUrl: "http://localhost:8080",
-  logo: "/logo.svg",
-  logoUrl: "/",
-  locale: "en",
-  features: {
-    isRegistrationEmailAsUsername: false,
-    isEditUserNameAllowed: true,
-    isInternationalizationEnabled: true,
-    isLinkedAccountsEnabled: true,
-    isEventsEnabled: true,
-    isMyResourcesEnabled: true,
-    isTotpConfigured: true,
-    deleteAccountAllowed: true,
-    updateEmailFeatureEnabled: true,
-    updateEmailActionEnabled: true,
-    isViewGroupsEnabled: true,
-  },
-};
-
-// Merge the default and injected environment variables together.
-const environment: Environment = {
-  ...defaultEnvironment,
-  ...getInjectedEnvironment(),
-};
-
-export { environment };
-
-/**
- * Extracts the environment variables that are passed if the application is running as a Keycloak theme.
- * These variables are injected by Keycloak into the `index.ftl` as a script tag, the contents of which can be parsed as JSON.
- */
-function getInjectedEnvironment(): Record<string, string | number | boolean> {
-  const element = document.getElementById("environment");
-
-  let env = {} as Record<string, string | number | boolean>;
-
-  // Attempt to parse the contents as JSON and return its value.
-  try {
-    // If the element cannot be found, return an empty record.
-    if (element?.textContent) {
-      env = JSON.parse(element.textContent);
-    }
-  } catch (error) {
-    console.error("Unable to parse environment variables.");
-  }
-
-  // Otherwise, return an empty record.
-  return env;
-}
+export const environment = getInjectedEnvironment<Environment>();

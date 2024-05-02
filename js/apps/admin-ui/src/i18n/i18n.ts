@@ -2,7 +2,7 @@ import { createInstance } from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import HttpBackend from "i18next-http-backend";
-import environment from "../environment";
+import { environment } from "../environment";
 import { joinPath } from "../utils/joinPath";
 
 type KeyValue = { key: string; value: string };

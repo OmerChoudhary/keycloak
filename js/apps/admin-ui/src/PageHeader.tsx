@@ -24,7 +24,7 @@ import { HelpHeader } from "./components/help-enabler/HelpHeader";
 import { useRealm } from "./context/realm-context/RealmContext";
 import { useWhoAmI } from "./context/whoami/WhoAmI";
 import { toDashboard } from "./dashboard/routes/Dashboard";
-import environment from "./environment";
+import { environment } from "./environment";
 import { keycloak } from "./keycloak";
 
 const ManageAccountDropdownItem = () => {

@@ -12,7 +12,7 @@ import {
 import { adminClient } from "../../admin-client";
 import { FileUploadForm } from "../../components/json-file-upload/FileUploadForm";
 import { useRealm } from "../../context/realm-context/RealmContext";
-import environment from "../../environment";
+import { environment } from "../../environment";
 import { addTrailingSlash } from "../../util";
 import { getAuthorizationHeaders } from "../../utils/getAuthorizationHeaders";
 import { DiscoveryEndpointField } from "../component/DiscoveryEndpointField";
@@ -36,7 +36,7 @@ export const SamlConnectSettings = () => {
 
   const setupForm = (result: IdentityProviderRepresentation) => {
     Object.entries(result).map(([key, value]) =>
-      setValue(`config.${key}`, value),
+      setValue(`config.${key}`, value)
     );
   };
 
@@ -52,13 +52,13 @@ export const SamlConnectSettings = () => {
     try {
       const response = await fetchWithError(
         `${addTrailingSlash(
-          adminClient.baseUrl,
+          adminClient.baseUrl
         )}admin/realms/${realm}/identity-provider/import-config`,
         {
           method: "POST",
           body: formData,
           headers: getAuthorizationHeaders(await adminClient.getAccessToken()),
-        },
+        }
       );
       if (response.ok) {
         const result = await response.json();

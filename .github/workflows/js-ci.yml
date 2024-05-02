@@ -198,8 +198,6 @@ jobs:
 
       - name: Run Playwright tests
         run: pnpm --filter ${{ env.WORKSPACE }} test
-        env:
-          KEYCLOAK_SERVER: http://localhost:8080
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -283,7 +281,6 @@ jobs:
           working-directory: js/apps/admin-ui
         env:
           CYPRESS_BASE_URL: http://localhost:8080/admin/
-          CYPRESS_KEYCLOAK_SERVER: http://localhost:8080
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
 

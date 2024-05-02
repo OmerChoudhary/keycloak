@@ -1,6 +1,6 @@
 import KeycloakAdminClient from "@keycloak/keycloak-admin-client";
 
-import environment from "./environment";
+import { environment } from "./environment";
 import { keycloak } from "./keycloak";
 
 export const adminClient = new KeycloakAdminClient();
