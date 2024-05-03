@@ -1,10 +1,13 @@
 import RealmRepresentation from "@keycloak/keycloak-admin-client/lib/defs/realmRepresentation";
-import { ActionGroup, Button, FormGroup } from "@patternfly/react-core";
 import {
+  ActionGroup,
+  Button,
+  FormGroup,
+  MenuToggle,
   Select,
+  SelectList,
   SelectOption,
-  SelectVariant,
-} from "@patternfly/react-core/deprecated";
+} from "@patternfly/react-core";
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -157,21 +160,30 @@ export const AdvancedSettings = ({
               control={control}
               render={({ field }) => (
                 <Select
-                  toggleId="keyForCodeExchange"
-                  variant={SelectVariant.single}
-                  onToggle={(_event, val) => setOpen(val)}
+                  id="keyForCodeExchange"
+                  toggle={(ref) => (
+                    <MenuToggle
+                      ref={ref}
+                      onClick={() => setOpen(!open)}
+                      isExpanded={open}
+                    >
+                      {[field.value || t("choose")]}
+                    </MenuToggle>
+                  )}
                   isOpen={open}
                   onSelect={(_, value) => {
                     field.onChange(value);
                     setOpen(false);
                   }}
-                  selections={[field.value || t("choose")]}
+                  selected={field.value}
                 >
-                  {["", "S256", "plain"].map((v) => (
-                    <SelectOption key={v} value={v}>
-                      {v || t("choose")}
-                    </SelectOption>
-                  ))}
+                  <SelectList>
+                    {["", "S256", "plain"].map((v) => (
+                      <SelectOption key={v} value={v}>
+                        {v || t("choose")}
+                      </SelectOption>
+                    ))}
+                  </SelectList>
                 </Select>
               )}
             />
