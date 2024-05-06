@@ -10,6 +10,7 @@ export enum Feature {
   TransientUsers = "TRANSIENT_USERS",
   ClientTypes = "CLIENT_TYPES",
   DeclarativeUI = "DECLARATIVE_UI",
+  AssertionGrant = "ASSERTION_GRANT",
 }
 
 export default function useIsFeatureEnabled() {
