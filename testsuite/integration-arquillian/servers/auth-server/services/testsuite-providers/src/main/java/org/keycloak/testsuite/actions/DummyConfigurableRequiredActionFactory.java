@@ -34,6 +34,10 @@ public class DummyConfigurableRequiredActionFactory implements RequiredActionFac
 
     public static final String PROVIDER_ID = "configurable-test-action";
 
+    public static final String SETTING_1 = "setting1";
+
+    public static final String SETTING_2 = "setting2";
+
     @Override
     public String getDisplayText() {
         return "Configurable Test Action";
@@ -53,6 +57,8 @@ public class DummyConfigurableRequiredActionFactory implements RequiredActionFac
                 // users can access the given Required Action configuration via RequiredActionContext#getContext()
                 RequiredActionConfigModel configModel = context.getConfig();
                 Map<String, String> config = configModel.getConfig();
+
+                String setting1Value = configModel.getConfigValue(SETTING_1);
 
                 context.success();
             }
@@ -88,20 +94,23 @@ public class DummyConfigurableRequiredActionFactory implements RequiredActionFac
         return PROVIDER_ID;
     }
 
-    private static final List<ProviderConfigProperty> CONFIG_PROPERTIES = ProviderConfigurationBuilder.create().property() //
-            .name("setting1") //
+    private static final List<ProviderConfigProperty> CONFIG_PROPERTIES = ProviderConfigurationBuilder.create() //
+            .property() //
+            .name(SETTING_1) //
             .label("Setting 1") //
             .helpText("Setting 1 Help Text") //
             .type(ProviderConfigProperty.STRING_TYPE) //
-            .defaultValue("default value") //
+            .defaultValue("setting1Default") //
             .add() //
+
             .property() //
-            .name("setting2") //
+            .name(SETTING_2) //
             .label("Setting 2") //
             .helpText("Setting 2 Help Text") //
             .type(ProviderConfigProperty.BOOLEAN_TYPE) //
             .defaultValue("true") //
             .add() //
+
             .build();
 
     @Override
