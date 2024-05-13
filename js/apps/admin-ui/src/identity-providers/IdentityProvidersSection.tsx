@@ -127,6 +127,7 @@ export default function IdentityProvidersSection() {
             key={provider.id}
             value={provider.id}
             component="a"
+            data-testid={provider.id}
             onClick={() =>
               navigate(
                 toIdentityProviderCreate({
