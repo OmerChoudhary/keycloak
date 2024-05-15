@@ -1,0 +1,58 @@
+<#import "/templates/guide.adoc" as tmpl>
+
+<@tmpl.guide
+title="Scaling"
+summary="Get started with {project_name} scaling and tuning">
+
+Once you have {project_name} started you can next consider adapting your instance to whatever load may be needed. Scaling and tuning can help you address:
+- minimizing resource utilization
+- excessive response times
+- database pool contention
+- out of memory errors, or excessive garbage collection overhead
+- providing higher availability via horizontal scaling
+
+== Vertical Scaling
+
+As you monitor your {project_name} workload if you see that CPU or memory is either under or over utilized, please consult <@links.ha id="concepts-memory-and-cpu-sizing" /> to better tune the resources available to the VM.
+
+Before increasing the amount of memory available to the VM, in particular when experiencing an out of memory error, it's best to determine what is contributing to the increased footprint (TODO: should there be a link for taking a heap dump - would instructions need to be provided for each deployment type). Excessive response times may also indicate the http work queue is too large (TODO: where to monitor this) and tuning for load shedding would be better than simply providing more memory - see below.
+
+=== VM Tuning
+
+VM Tuning is highly related to the resources available to the VM. For example the default garbage collection settings may work well certain heap sizes, but could be not ideal for much smaller or larger VMs. (TODO: anything we should point to that constitutes excessive GC activity > x%)
+
+While there is some automatic adjustment based upon how many cores you make available to your {project_name} server, fine-tuning thread counts can improve overall throughput see <@links.ha id="concepts-threads" /> - but this must be done in conjuction with other VM resources, such as database connections - see <@links.ha id="concepts-database-connections" /> otherwise you may simply move a bottleneck somewhere else.
+
+To limit memory utilization of queued work and to provide for load shedding see <@links.ha id="concepts-threads#load-shedding" /> 
+
+If you are experiencing timeouts in obtaining database connections, you should consider increasing the number of connections available - see <@links.ha id="concepts-database-connections" />
+
+=== Vertical Autoscaling
+
+Some platforms, such as Kubernetes, provide mechanisms to vertically autoscale. That may not be recommended for {project_name} as it typically requires restarting the server instance. More generally you can consider instead providing higher CPU and/or memory limits to your container to allow your VM to adapt within those limits as needed (TODO: any mention of the issues we are currently seeing with heap space growth toward the limit)
+
+
+== Horizontal Scaling
+
+A single {project_name} is susceptible to availability issues, either from downtime, or from potentially loosing in-memory only sessions. By running at least two cluster members on different machines you will greatly increase the availability of Keycloak. 
+
+There will be a limit on the amount of concurrent requests a single VM can effectively handle, until an associated resources such as the database becomes the bottleneck, additional server instances should provide roughly linear scaling of throughput.
+
+On Kubernetes you can use pod anti-affinitity ...
+
+The embedded Infinispan cache is not well suited for clusters crossing availability zones, also known as a stretch clusters. It is recommended that when using the embedded Infinispan cache that the instances all exist in the same availability zone.
+
+On Kubernetes you can use pod affinity ...
+
+The embedded Infinispan cache also has issues with multiple members joining at the same time.
+
+On Kubernetes you can use a StatefulSet ... and the operator handles this for you
+
+Keep in mind that running at least instances does not make your installation highly available as you are still vulnerable to the loss of a single site. Please consult the high availability guide for more on a multi-site deployment - see <@links.ha id="introduction" />.
+
+=== Horizontal Autoscaling
+
+By default {project_name} uses an embedded Infinispan cache cluster. Dynamically adding or removing cluster members requires Infinispan to perform an expensive rebalancing of cache state. Rebalancing can be avoided by using an external cache - see <@links.ha id="connect-keycloak-to-external-infinispan" />.
+
+On Kubernetes the Keycloak custom resource is scalable...
+
