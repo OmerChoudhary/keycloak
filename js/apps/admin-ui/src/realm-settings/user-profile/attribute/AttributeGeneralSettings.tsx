@@ -276,7 +276,7 @@ export const AttributeGeneralSettings = ({
                     aria-label={t("addAttributeTranslationBtn")}
                     isDisabled={!newAttributeName && !editMode}
                     onClick={() => {
-                    setType("displayName");
+                      setType("displayName");
                       toggleModal();
                     }}
                     icon={<GlobeRouteIcon />}
