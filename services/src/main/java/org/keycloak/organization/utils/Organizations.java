@@ -17,9 +17,11 @@
 
 package org.keycloak.organization.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.keycloak.common.Profile;
 import org.keycloak.common.Profile.Feature;
@@ -54,16 +56,16 @@ public class Organizations {
     public static IdentityProviderModel resolveBroker(KeycloakSession session, UserModel user) {
         OrganizationProvider provider = session.getProvider(OrganizationProvider.class);
         RealmModel realm = session.getContext().getRealm();
-        OrganizationModel organization = provider.getByMember(user);
+        List<OrganizationModel> organizations = provider.getByMember(user)
+                .filter(OrganizationModel::isEnabled)
+                .filter((org) -> org.isManaged(user))
+                .toList();
+        List<IdentityProviderModel> brokers = new ArrayList<>();
 
-        if (organization == null || !organization.isEnabled()) {
-            return null;
-        }
-
-        if (provider.isManagedMember(organization, user)) {
+        for (OrganizationModel organization : organizations) {
             // user is a managed member, try to resolve the origin broker and redirect automatically
             List<IdentityProviderModel> organizationBrokers = organization.getIdentityProviders().toList();
-            List<IdentityProviderModel> brokers = session.users().getFederatedIdentitiesStream(realm, user)
+            session.users().getFederatedIdentitiesStream(realm, user)
                     .map(f -> {
                         IdentityProviderModel broker = realm.getIdentityProviderByAlias(f.getIdentityProvider());
 
@@ -79,12 +81,10 @@ public class Organizations {
 
                         return null;
                     }).filter(Objects::nonNull)
-                    .toList();
-
-            return brokers.size() == 1 ? brokers.get(0) : null;
+                    .forEach(brokers::add);
         }
 
-        return null;
+        return brokers.size() == 1 ? brokers.get(0) : null;
     }
 
     public static Consumer<GroupModel> removeGroup(KeycloakSession session, RealmModel realm) {
