@@ -185,7 +185,7 @@ export function DraggableTable<T>({
   const thInfo = (column: Field<T>): ThInfoType | undefined => {
     if (!column.thTooltipText) return undefined;
     return {
-      popover: t(column.thTooltipText),
+      popover: <div>{t(column.thTooltipText)}</div>,
       ariaLabel: t(column.thTooltipText),
     };
   };
