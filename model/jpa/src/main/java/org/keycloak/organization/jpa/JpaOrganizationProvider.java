@@ -17,16 +17,19 @@
 
 package org.keycloak.organization.jpa;
 
+import static java.util.function.Predicate.not;
 import static org.keycloak.models.OrganizationModel.BROKER_PUBLIC;
 import static org.keycloak.models.OrganizationModel.ORGANIZATION_ATTRIBUTE;
 import static org.keycloak.models.OrganizationModel.ORGANIZATION_DOMAIN_ATTRIBUTE;
 import static org.keycloak.models.jpa.PaginationUtils.paginateQuery;
 import static org.keycloak.utils.StreamsUtil.closing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -122,7 +125,8 @@ public class JpaOrganizationProvider implements OrganizationProvider {
 
                 if (group != null) {
                     //TODO: won't scale, requires a better mechanism for bulk deleting users
-                    userProvider.getGroupMembersStream(this.realm, group).forEach(userModel -> removeMember(organization, userModel));
+                    userProvider.getGroupMembersStream(this.realm, group)
+                            .forEach(userModel -> removeMember(organization, userModel));
                     groupProvider.removeGroup(this.realm, group);
                 }
 
@@ -167,12 +171,13 @@ public class JpaOrganizationProvider implements OrganizationProvider {
                 return false;
             }
 
-            if (user.getFirstAttribute(ORGANIZATION_ATTRIBUTE) != null) {
-                throw new ModelException("User [" + user.getId() + "] is a member of a different organization");
-            }
-
             user.joinGroup(group);
-            user.setSingleAttribute(ORGANIZATION_ATTRIBUTE, entity.getId());
+
+            List<String> orgIds = new ArrayList<>(getByMember(user).map(OrganizationModel::getId).toList());
+
+            orgIds.add(entity.getId());
+
+            user.setAttribute(ORGANIZATION_ATTRIBUTE, orgIds);
         } finally {
             if (current == null) {
                 session.removeAttribute(OrganizationModel.class.getName());
@@ -261,9 +266,7 @@ public class JpaOrganizationProvider implements OrganizationProvider {
             return null;
         }
 
-        String orgId = user.getFirstAttribute(ORGANIZATION_ATTRIBUTE);
-
-        if (organization.getId().equals(orgId)) {
+        if (getByMember(user).anyMatch(organization::equals)) {
             return user;
         }
 
@@ -271,16 +274,16 @@ public class JpaOrganizationProvider implements OrganizationProvider {
     }
 
     @Override
-    public OrganizationModel getByMember(UserModel member) {
+    public Stream<OrganizationModel> getByMember(UserModel member) {
         throwExceptionIfObjectIsNull(member, "User");
 
-        String orgId = member.getFirstAttribute(ORGANIZATION_ATTRIBUTE);
+        List<String> orgId = member.getAttributeStream(ORGANIZATION_ATTRIBUTE).toList();
 
-        if (orgId == null) {
-            return null;
+        if (orgId.isEmpty()) {
+            return Stream.of();
         }
 
-        return getById(orgId);
+        return orgId.stream().map((Function<Object, OrganizationModel>) o -> getById(o.toString()));
     }
 
     @Override
@@ -366,7 +369,7 @@ public class JpaOrganizationProvider implements OrganizationProvider {
         throwExceptionIfObjectIsNull(organization, "organization");
         throwExceptionIfObjectIsNull(member, "member");
 
-        OrganizationModel userOrg = getByMember(member);
+        OrganizationModel userOrg = getByMember(member).filter(organization::equals).findAny().orElse(null);
 
         if (userOrg == null || !userOrg.equals(organization)) {
             return false;
@@ -382,9 +385,14 @@ public class JpaOrganizationProvider implements OrganizationProvider {
             }
 
             try {
-                List<String> organizations = member.getAttributes().get(ORGANIZATION_ATTRIBUTE);
-                organizations.remove(organization.getId());
-                member.setAttribute(ORGANIZATION_ATTRIBUTE, organizations);
+                List<OrganizationModel> organizations = getByMember(member).filter(not(organization::equals)).toList();
+
+                if (organizations.isEmpty()) {
+                    member.removeAttribute(ORGANIZATION_ATTRIBUTE);
+                } else {
+                    member.setAttribute(ORGANIZATION_ATTRIBUTE, organizations.stream().map(OrganizationModel::getId).toList());
+                }
+
                 member.leaveGroup(getOrganizationGroup(organization));
             } finally {
                 if (current == null) {

@@ -17,6 +17,7 @@
 
 package org.keycloak.organization.admin.resource;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -183,24 +184,23 @@ public class OrganizationMemberResource {
     @Path("{id}/organization")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public OrganizationRepresentation getOrganization(@PathParam("id") String id) {
+    public Stream<OrganizationRepresentation> getOrganization(@PathParam("id") String id) {
         auth.realm().requireManageRealm();
         if (StringUtil.isBlank(id)) {
             throw ErrorResponse.error("id cannot be null", Status.BAD_REQUEST);
         }
 
         UserModel member = getMember(id);
-        OrganizationModel organization = provider.getByMember(member);
+        List<OrganizationModel> organizations = provider.getByMember(member).toList();
 
-        if (organization == null) {
-            throw ErrorResponse.error("Not associated with an organization", Status.NOT_FOUND);
-        }
+        return organizations.stream().map((org) -> {
+            OrganizationRepresentation organization = new OrganizationRepresentation();
 
-        OrganizationRepresentation rep = new OrganizationRepresentation();
+            organization.setId(org.getId());
+            organization.setName(org.getName());
 
-        rep.setId(organization.getId());
-
-        return rep;
+            return organization;
+        });
     }
 
     private UserModel getMember(String id) {

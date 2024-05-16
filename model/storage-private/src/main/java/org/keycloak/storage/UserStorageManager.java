@@ -118,8 +118,8 @@ public class UserStorageManager extends AbstractStorageManager<UserStorageProvid
         if (Profile.isFeatureEnabled(Profile.Feature.ORGANIZATION) && user != null) {
             // check if user belongs to a disabled organization
             OrganizationProvider organizationProvider = session.getProvider(OrganizationProvider.class);
-            OrganizationModel organization = organizationProvider.getByMember(user);
-            if (organization != null && organization.isManaged(user) && !organization.isEnabled()) {
+            if (organizationProvider.getByMember(user)
+                    .anyMatch((org) -> org.isManaged(user) && !org.isEnabled())) {
                 return new ReadOnlyUserModelDelegate(user) {
                     @Override
                     public boolean isEnabled() {

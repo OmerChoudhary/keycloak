@@ -342,8 +342,8 @@ public class UserCacheSession implements UserCache, OnCreateComponent, OnUpdateC
         if (Profile.isFeatureEnabled(Profile.Feature.ORGANIZATION)) {
             // check if user is member of a disabled organization.
             OrganizationProvider organizationProvider = session.getProvider(OrganizationProvider.class);
-            OrganizationModel organization = organizationProvider.getByMember(delegate);
-            if (organization != null && organization.isManaged(delegate) && !organization.isEnabled()) {
+            if (organizationProvider.getByMember(delegate)
+                    .anyMatch((org) -> org.isManaged(delegate) && !org.isEnabled())) {
                 return new ReadOnlyUserModelDelegate(delegate) {
                     @Override
                     public boolean isEnabled() {
