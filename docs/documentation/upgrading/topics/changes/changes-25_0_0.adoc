@@ -329,3 +329,7 @@ one of the future {project_name} releases. It might be {project_name} 27 release
 `org.keycloak.common.util.Resteasy` has been deprecated. You should use the `org.keycloak.util.KeycloakSessionUtil` to obtain the `KeycloakSession` instead.
 
 It is highly recommended to avoid obtaining the `KeycloakSession` by means other than when creating your custom provider.
+
+= CollectionUtil intesection method removed
+
+The method `org.keycloak.common.util.CollectionUtil.intersection` has been removed. You should use the 'java.util.Collection.retainAll' instead on an existing collection.
