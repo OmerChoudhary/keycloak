@@ -86,6 +86,15 @@ some OpenID Connect / OAuth 2.0 flows.
 
 The cookie `KC_AUTH_STATE` is removed and it is no longer set by the {project_name} server as this server no longer needs this cookie.
 
+= Java 21 support
+
+{project_name} now supports OpenJDK 21, as we want to stick to the latest LTS OpenJDK versions.
+
+= Java 17 is deprecated
+
+OpenJDK 17 is deprecated, and the support will be removed in the following releases in favor of OpenJDK 21.
+It is still possible to use it, but the test coverage might be decreased.
+
 = Deprecated cookie methods removed
 
 The following methods for setting custom cookies have been removed:
