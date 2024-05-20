@@ -54,7 +54,7 @@ final class ConfigKeystorePropertyMappers {
             throw new IllegalArgumentException("config-keystore path does not exist: " + realPath);
         }
 
-        return Optional.of(realPath.toUri().toString());
+        return Optional.of(Path.of(realPath.toString()).toUri().toString());
     }
 
     private static Optional<String> validatePassword(Optional<String> option, ConfigSourceInterceptorContext context) {
