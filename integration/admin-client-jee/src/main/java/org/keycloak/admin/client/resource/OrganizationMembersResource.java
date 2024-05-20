@@ -76,11 +76,11 @@ public interface OrganizationMembersResource {
 
     @POST
     @Path("invite-user")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     Response inviteUser(String email);
 
     @POST
     @Path("invite-existing-user")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     Response inviteExistingUser(String id);
 }

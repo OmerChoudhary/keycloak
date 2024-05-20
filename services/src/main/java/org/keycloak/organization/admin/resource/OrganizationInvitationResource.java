@@ -76,11 +76,11 @@ public class OrganizationInvitationResource {
         if (user != null) {
             OrganizationModel org = provider.getByMember(user);
 
-            if (org.equals(organization)) {
+            if (org != null && org.equals(organization)) {
                 throw ErrorResponse.error("User already a member of the organization", Status.CONFLICT);
             }
 
-            throw ErrorResponse.error("User already exists with this e-mail", Status.BAD_REQUEST);
+            return sendInvitation(user);
         }
 
         user = new InMemoryUserAdapter(session, realm, null);
