@@ -87,19 +87,26 @@ public class OrganizationInvitationLinkTest extends AbstractOrganizationTest {
 
         organization.members().inviteExistingUser(user.getId()).close();
 
-        MimeMessage message = greenMail.getLastReceivedMessage();
-        Assert.assertNotNull(message);
-        Assert.assertEquals("Invitation to join the " + organizationName + " organization", message.getSubject());
-        EmailBody body = MailUtils.getBody(message);
-        String link = MailUtils.getLink(body.getHtml());
-        driver.navigate().to(link.trim());
-        // not yet a member
-        Assert.assertFalse(organization.members().getAll().stream().anyMatch(actual -> user.getId().equals(actual.getId())));
-        // confirm the intent of membership
-        infoPage.clickToContinue();
-        assertThat(infoPage.getInfo(), containsString("Your account has been updated."));
-        // now a member
-        Assert.assertNotNull(organization.members().member(user.getId()).toRepresentation());
+        acceptInvitation(organization, user);
+    }
+
+    @Test
+    public void testInviteExistingUserWithEmail() throws IOException, MessagingException {
+        UserRepresentation user = UserBuilder.create()
+                .username("invitedWithMatchingEmail")
+                .email("invitedWithMatchingEmail@myemail.com")
+                .password("password")
+                .enabled(true)
+                .build();
+        try (Response response = testRealm().users().create(user)) {
+            user.setId(ApiUtil.getCreatedId(response));
+        }
+
+        OrganizationResource organization = testRealm().organizations().get(createOrganization().getId());
+
+        organization.members().inviteUser(user.getEmail()).close();
+
+        acceptInvitation(organization, user);
     }
 
     @Test
@@ -200,5 +207,21 @@ public class OrganizationInvitationLinkTest extends AbstractOrganizationTest {
         } finally {
             resetTimeOffset();
         }
+    }
+
+    private void acceptInvitation(OrganizationResource organization, UserRepresentation user) throws MessagingException, IOException {
+        MimeMessage message = greenMail.getLastReceivedMessage();
+        Assert.assertNotNull(message);
+        Assert.assertEquals("Invitation to join the " + organizationName + " organization", message.getSubject());
+        EmailBody body = MailUtils.getBody(message);
+        String link = MailUtils.getLink(body.getHtml());
+        driver.navigate().to(link.trim());
+        // not yet a member
+        Assert.assertFalse(organization.members().getAll().stream().anyMatch(actual -> user.getId().equals(actual.getId())));
+        // confirm the intent of membership
+        infoPage.clickToContinue();
+        assertThat(infoPage.getInfo(), containsString("Your account has been updated."));
+        // now a member
+        Assert.assertNotNull(organization.members().member(user.getId()).toRepresentation());
     }
 }
