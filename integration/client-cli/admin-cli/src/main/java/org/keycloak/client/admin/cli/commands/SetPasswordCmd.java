@@ -45,7 +45,7 @@ public class SetPasswordCmd extends AbstractAuthOptionsCmd {
     @Option(names = "--userid", description = "User ID")
     String userid;
 
-    @Option(names = {"-p", "--new-password"}, description = "New password")
+    @Option(names = {"-p", "--new-password"}, description = "New password", defaultValue = "${env:KC_CLI_PASSWORD}")
     String pass;
 
     @Option(names = {"-t", "--temporary"}, description = "is password temporary")
@@ -128,7 +128,7 @@ public class SetPasswordCmd extends AbstractAuthOptionsCmd {
         out.println("  Command specific options:");
         out.println("    --username USERNAME       Identify target user by 'username'");
         out.println("    --userid ID               Identify target user by 'id'");
-        out.println("    -p, --new-password        New password to set. If not specified you will be prompted for it.");
+        out.println("    -p, --new-password        New password to set. If not specified and the env variable KC_CLI_PASSWORD is not defined, you will be prompted for it.");
         out.println("    -t, --temporary           Make the new password temporary - user has to change it on next logon");
         out.println("    -a, --admin-root URL      URL of Admin REST endpoint root if not default - e.g. http://localhost:8080/admin");
         out.println("    -r, --target-realm REALM  Target realm to issue requests against if not the one authenticated against");

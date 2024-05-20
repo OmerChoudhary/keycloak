@@ -202,7 +202,7 @@ public class BaseConfigCredentialsCmd extends BaseAuthOptionsCmd {
         out.println("    --server SERVER_URL     Server endpoint url (e.g. 'http://localhost:8080')");
         out.println("    --realm REALM           Realm name to use");
         out.println("    --user USER             Username to login with");
-        out.println("    --password PASSWORD     Password to login with (prompted for if not specified and --user is used)");
+        out.println("    --password PASSWORD     Password to login with (prompted for if not specified, --user is used, and the env variable KC_CLI_PASSWORD is not defined)");
         out.println("    --client CLIENT_ID      ClientId used by this client tool ('admin-cli' by default)");
         out.println("    --secret SECRET         Secret to authenticate the client (prompted for if --client is specified, and no --keystore is specified)");
         out.println("    --keystore PATH         Path to a keystore containing private key");

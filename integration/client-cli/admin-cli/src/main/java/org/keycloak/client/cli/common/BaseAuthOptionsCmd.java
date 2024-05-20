@@ -62,7 +62,7 @@ public abstract class BaseAuthOptionsCmd extends BaseGlobalOptionsCmd {
     @Option(names = "--user", description = "Username to login with")
     protected String user;
 
-    @Option(names = "--password", description = "Password to login with (prompted for if not specified and --user is used)")
+    @Option(names = "--password", description = "Password to login with (prompted for if not specified, --user is used, and the env variable KC_CLI_PASSWORD is not defined)", defaultValue = "${env:KC_CLI_PASSWORD}")
     protected String password;
 
     @Option(names = "--secret", description = "Secret to authenticate the client (prompted for if no --user or --keystore is specified)")
