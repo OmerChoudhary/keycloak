@@ -881,11 +881,12 @@ public class AccountRestServiceTest extends AbstractRestServiceTest {
         assertEquals(204, response.getStatus());
 
         events.poll();
-        events.expect(EventType.REMOVE_TOTP)
+        events.expect(EventType.REMOVE_CREDENTIAL)
                 .client("account")
                 .user(user.toRepresentation().getId())
                 .detail(Details.SELECTED_CREDENTIAL_ID, otpCredential.getId())
                 .detail(Details.CREDENTIAL_USER_LABEL, "totpCredentialUserLabel")
+                .detail(Details.CREDENTIAL_TYPE, OTPCredentialModel.TYPE)
                 .assertEvent();
         events.assertEmpty();
     }

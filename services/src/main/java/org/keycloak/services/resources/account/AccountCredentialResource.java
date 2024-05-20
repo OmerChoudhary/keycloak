@@ -23,7 +23,6 @@ import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.models.utils.ModelToRepresentation;
 import org.keycloak.protocol.oidc.utils.AcrUtils;
 import org.keycloak.representations.account.CredentialMetadataRepresentation;
@@ -304,8 +303,9 @@ public class AccountCredentialResource {
         auth.require(AccountRoles.MANAGE_ACCOUNT);
         CredentialModel credential = CredentialDeleteHelper.removeCredential(session, user, credentialId, this::getCurrentAuthenticatedLevel);
 
-        if (credential != null && OTPCredentialModel.TYPE.equals(credential.getType())) {
-            event.event(EventType.REMOVE_TOTP)
+        if (credential != null) {
+            event.event(EventType.REMOVE_CREDENTIAL)
+                    .detail(Details.CREDENTIAL_TYPE, credential.getType())
                     .detail(Details.SELECTED_CREDENTIAL_ID, credentialId)
                     .detail(Details.CREDENTIAL_USER_LABEL, credential.getUserLabel());
             event.success();

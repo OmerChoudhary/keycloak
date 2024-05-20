@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.keycloak.events.Details;
 import org.keycloak.events.EventType;
 import org.keycloak.models.UserModel.RequiredAction;
+import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.testsuite.AssertEvents;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
@@ -86,7 +87,7 @@ public class RequiredActionMultipleActionsTest extends AbstractTestRealmKeycloak
     public String updatePassword(String codeId) {
         changePasswordPage.changePassword("new-password", "new-password");
 
-        AssertEvents.ExpectedEvent expectedEvent = events.expectRequiredAction(EventType.UPDATE_PASSWORD);
+        AssertEvents.ExpectedEvent expectedEvent = events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE);
         if (codeId != null) {
             expectedEvent.detail(Details.CODE_ID, codeId);
         }
