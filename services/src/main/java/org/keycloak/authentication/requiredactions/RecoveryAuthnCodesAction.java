@@ -98,6 +98,37 @@ public class RecoveryAuthnCodesAction implements RequiredActionProvider, Require
         generatedAtTime = Long.parseLong(httpReqParamsMap.getFirst(FIELD_GENERATED_AT_HIDDEN));
         generatedUserLabel = httpReqParamsMap.getFirst(FIELD_USER_LABEL_HIDDEN);
 
+        // Retrieve the initially generated recovery codes from the authentication session
+        String storedCodes = reqActionContext.getAuthenticationSession().getAuthNote("initialGeneratedCodes");
+        if (storedCodes == null) {
+            Response challenge = reqActionContext.form()
+                    .setError("No initial recovery codes found.")
+                    .createErrorPage(Response.Status.BAD_REQUEST);
+            reqActionContext.challenge(challenge);
+            return;
+        }
+        List<String> initialGeneratedCodes = Arrays.asList(storedCodes.split(","));
+
+        // Check the number of recovery codes
+        if (generatedCodes.size() != initialGeneratedCodes.size()) {
+            Response challenge = reqActionContext.form()
+                    .setError("Invalid number of recovery codes.")
+                    .createErrorPage(Response.Status.BAD_REQUEST);
+            reqActionContext.challenge(challenge);
+            return;
+        }
+
+        // Check the content of the recovery codes
+        for (String code : generatedCodes) {
+            if (!initialGeneratedCodes.contains(code)) {
+                Response challenge = reqActionContext.form()
+                        .setError("Invalid recovery code.")
+                        .createErrorPage(Response.Status.BAD_REQUEST);
+                reqActionContext.challenge(challenge);
+                return;
+            }
+        }
+
         RecoveryAuthnCodesCredentialModel credentialModel = createFromValues(generatedCodes, generatedAtTime, generatedUserLabel);
 
         if ("on".equals(httpReqParamsMap.getFirst("logout-sessions"))) {
