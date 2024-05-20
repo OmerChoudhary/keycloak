@@ -56,7 +56,7 @@ import org.keycloak.models.sessions.infinispan.events.RealmRemovedSessionEvent;
 import org.keycloak.models.sessions.infinispan.events.RemoveUserSessionsEvent;
 import org.keycloak.models.sessions.infinispan.events.SessionEventsSenderTransaction;
 import org.keycloak.models.sessions.infinispan.stream.Mappers;
-import org.keycloak.models.sessions.infinispan.stream.SessionPredicate;
+import org.keycloak.models.sessions.infinispan.stream.SessionWrapperPredicate;
 import org.keycloak.models.sessions.infinispan.stream.UserSessionPredicate;
 import org.keycloak.models.sessions.infinispan.util.FuturesHelper;
 import org.keycloak.models.sessions.infinispan.util.InfinispanKeyGenerator;
@@ -660,7 +660,7 @@ public class InfinispanUserSessionProvider implements UserSessionProvider, Sessi
         localCacheStoreIgnore
                 .entrySet()
                 .stream()
-                .filter(SessionPredicate.create(realmId))
+                .filter(SessionWrapperPredicate.create(realmId))
                 .map(Mappers.userSessionEntity())
                 .forEach(new Consumer<UserSessionEntity>() {
 
