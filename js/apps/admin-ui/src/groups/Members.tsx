@@ -5,13 +5,13 @@ import {
   AlertVariant,
   Button,
   Checkbox,
-  ToolbarItem,
-} from "@patternfly/react-core";
-import {
   Dropdown,
   DropdownItem,
-  KebabToggle,
-} from "@patternfly/react-core/deprecated";
+  DropdownList,
+  MenuToggle,
+  ToolbarItem,
+} from "@patternfly/react-core";
+import { EllipsisVIcon } from "@patternfly/react-icons";
 import { uniqBy } from "lodash-es";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -193,15 +193,21 @@ export const Members = () => {
               </ToolbarItem>
               <ToolbarItem>
                 <Dropdown
-                  toggle={
-                    <KebabToggle
-                      onToggle={() => setIsKebabOpen(!isKebabOpen)}
+                  toggle={(ref) => (
+                    <MenuToggle
+                      ref={ref}
+                      variant="plain"
+                      onClick={() => setIsKebabOpen(!isKebabOpen)}
+                      isExpanded={isKebabOpen}
                       isDisabled={selectedRows.length === 0}
-                    />
-                  }
+                    >
+                      <EllipsisVIcon />
+                    </MenuToggle>
+                  )}
+                  shouldFocusToggleOnSelect
                   isOpen={isKebabOpen}
-                  isPlain
-                  dropdownItems={[
+                >
+                  <DropdownList>
                     <DropdownItem
                       key="action"
                       component="button"
@@ -228,9 +234,9 @@ export const Members = () => {
                       }}
                     >
                       {t("leave")}
-                    </DropdownItem>,
-                  ]}
-                />
+                    </DropdownItem>
+                  </DropdownList>
+                </Dropdown>
               </ToolbarItem>
             </>
           )

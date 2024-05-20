@@ -200,7 +200,9 @@ export default class AdvancedTab extends PageObject {
 
   selectKeyForCodeExchangeInput(input: string) {
     cy.get(this.#keyForCodeExchangeInput).click();
-    cy.get(this.#keyForCodeExchangeInput + " + ul")
+    cy.get(this.#keyForCodeExchangeInput)
+      .parent()
+      .get("ul")
       .contains(input)
       .click();
     return this;
@@ -228,17 +230,13 @@ export default class AdvancedTab extends PageObject {
 
   selectBrowserFlowInput(input: string) {
     cy.get(this.#browserFlowInput).click();
-    cy.get(this.#browserFlowInput + " + ul")
-      .contains(input)
-      .click();
+    cy.get(this.#browserFlowInput).parent().get("ul").contains(input).click();
     return this;
   }
 
   selectDirectGrantInput(input: string) {
     cy.get(this.#directGrantInput).click();
-    cy.get(this.#directGrantInput + " + ul")
-      .contains(input)
-      .click();
+    cy.get(this.#directGrantInput).parent().get("ul").contains(input).click();
     return this;
   }
 

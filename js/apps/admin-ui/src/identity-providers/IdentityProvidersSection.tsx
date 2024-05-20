@@ -6,7 +6,12 @@ import {
   Button,
   ButtonVariant,
   CardTitle,
+  Dropdown,
+  DropdownGroup,
+  DropdownItem,
+  DropdownList,
   Gallery,
+  MenuToggle,
   PageSection,
   Split,
   SplitItem,
@@ -15,12 +20,6 @@ import {
   TextVariants,
   ToolbarItem,
 } from "@patternfly/react-core";
-import {
-  Dropdown,
-  DropdownGroup,
-  DropdownItem,
-  DropdownToggle,
-} from "@patternfly/react-core/deprecated";
 import { groupBy, sortBy } from "lodash-es";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -127,18 +126,19 @@ export default function IdentityProvidersSection() {
           <DropdownItem
             key={provider.id}
             value={provider.id}
-            component={
-              <Link
-                to={toIdentityProviderCreate({
+            component="a"
+            data-testid={provider.id}
+            onClick={() =>
+              navigate(
+                toIdentityProviderCreate({
                   realm,
                   providerId: provider.id,
-                })}
-                data-testid={provider.id}
-              >
-                {provider.name}
-              </Link>
+                }),
+              )
             }
-          />
+          >
+            {provider.name}
+          </DropdownItem>
         ))}
       </DropdownGroup>
     ));
@@ -228,17 +228,19 @@ export default function IdentityProvidersSection() {
                 <ToolbarItem>
                   <Dropdown
                     data-testid="addProviderDropdown"
-                    toggle={
-                      <DropdownToggle
-                        onToggle={() => setAddProviderOpen(!addProviderOpen)}
-                        toggleVariant="primary"
+                    toggle={(ref) => (
+                      <MenuToggle
+                        ref={ref}
+                        onClick={() => setAddProviderOpen(!addProviderOpen)}
+                        variant="primary"
                       >
                         {t("addProvider")}
-                      </DropdownToggle>
-                    }
+                      </MenuToggle>
+                    )}
                     isOpen={addProviderOpen}
-                    dropdownItems={identityProviderOptions()}
-                  />
+                  >
+                    <DropdownList>{identityProviderOptions()}</DropdownList>
+                  </Dropdown>
                 </ToolbarItem>
 
                 <ToolbarItem>
