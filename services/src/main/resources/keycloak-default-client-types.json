@@ -6,8 +6,65 @@
       "config": {
         "standardFlowEnabled": {
           "applicable": true,
-          "default-value": true,
-          "read-only": true
+          "value": true
+        }
+      }
+    },
+    {
+      "name": "oidc",
+      "provider": "default",
+      "config": {
+        "authorizationServicesEnabled": {
+          "applicable": true,
+          "value": false
+        },
+        "consentRequired": {
+          "applicable": true,
+          "value": false
+        },
+        "directAccessGrantsEnabled": {
+          "applicable": true,
+          "value": false
+        },
+        "frontchannelLogout": {
+          "applicable": true,
+          "value": false
+        },
+        "fullScopeAllowed": {
+          "applicable": true,
+          "value": true
+        },
+        "implicitFlowEnabled": {
+          "applicable": true,
+          "value": false
+        },
+        "nodeReRegistrationTimeout": {
+          "applicable": true,
+          "value": -1
+        },
+        "oauth2.device.authorization.grant.enabled": {
+          "applicable": true,
+          "value": "false"
+        },
+        "oidc.ciba.grant.enabled": {
+          "applicable": true,
+          "value": "false"
+        },
+        "protocol": {
+          "applicable": true,
+          "value": "openid-connect"
+        },
+        "publicClient": {
+          "applicable": true,
+          "value": true
+        },
+        "serviceAccountsEnabled": {
+          "applicable": true,
+          "value": false
+        },
+        "standardFlowEnabled": {
+          "applicable": true,
+          "value": false
         }
       }
     },
@@ -26,8 +83,7 @@
         },
         "consentRequired": {
           "applicable": true,
-          "default-value": false,
-          "read-only": true
+          "value": false
         },
         "directAccessGrantsEnabled": {
           "applicable": false
@@ -55,21 +111,18 @@
         },
         "protocol": {
           "applicable": true,
-          "default-value": "openid-connect",
-          "read-only": true
+          "value": "openid-connect"
         },
         "publicClient": {
           "applicable": true,
-          "default-value": false,
-          "read-only": true
+          "value": false
         },
         "redirectUris": {
           "applicable": false
         },
         "serviceAccountsEnabled": {
           "applicable": true,
-          "default-value": true,
-          "read-only": true
+          "value": true
         },
         "standardFlowEnabled": {
           "applicable": false
