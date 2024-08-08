@@ -83,7 +83,7 @@
         <!-- TODO Are these correct versions? -->
         <bouncycastle.pkixfips.version>1.0.7</bouncycastle.pkixfips.version>
         <!-- 1.0.2.4 exhibits class loading issues -->
-        <bouncycastle.bcfips.version>1.0.2.3</bouncycastle.bcfips.version>
+        <bouncycastle.bcfips.version>1.0.2.5</bouncycastle.bcfips.version>
 
         <cxf.version>3.3.10</cxf.version>
         <cxf.jetty.version>3.3.10</cxf.jetty.version>
@@ -206,7 +206,7 @@
         <surefire.memory.metaspace>96m</surefire.memory.metaspace>
         <surefire.memory.metaspace.max>512m</surefire.memory.metaspace.max>
         <surefire.memory.settings>-Xms${surefire.memory.Xms} -Xmx${surefire.memory.Xmx} -XX:MetaspaceSize=${surefire.memory.metaspace} -XX:MaxMetaspaceSize=${surefire.memory.metaspace.max}</surefire.memory.settings>
-        <surefire.system.args></surefire.system.args>
+        <surefire.system.args/>
 
         <!-- webauthn support -->
         <webauthn4j.version>0.21.5.RELEASE</webauthn4j.version>
@@ -274,7 +274,7 @@
         </developer>
     </developers>
 
-    <contributors></contributors>
+    <contributors/>
 
     <modules>
         <module>boms</module>
